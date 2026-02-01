@@ -70,9 +70,11 @@ jobs:
                   echo "Postgres not ready"
                   exit 1
 
-            - name: Run migrations
+            - name: Prepare database schema
               working-directory: app
-              run: php bin/console doctrine:migrations:migrate --no-interaction
+              run: |
+                php bin/console doctrine:database:create --if-not-exists --env=test
+                php bin/console doctrine:migrations:migrate --no-interaction --env=test
 
             - name: Run tests
               working-directory: app
