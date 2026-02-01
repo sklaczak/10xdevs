@@ -38,7 +38,7 @@ jobs:
                   php-version: "8.3"
                   tools: composer
                   coverage: none
-                  extensions: intl, pdo_pgsql, zip
+                  extensions: intl, pdo_pgsql, zip, xml
 
             - name: Get Composer cache dir
               id: composer-cache
