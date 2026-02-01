@@ -1,4 +1,6 @@
 {
+    "name": "sklaczak/10xdevs",
+    "description": "Symfony 7.4 application for 10xdevs",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
