@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Faktury kosztowe{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="page-title">Faktury kosztowe</div>
+        <a href="{{ path('mobile_cost_invoice_new') }}" class="btn btn-primary btn-sm">
+            + Dodaj fakturę
+        </a>
+    </div>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    {% if invoices is empty %}
+        <div class="alert alert-info">
+            Brak faktur do wyświetlenia.
+        </div>
+    {% else %}
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Numer</th>
+                        <th>Kontrahent</th>
+                        <th class="text-end">Kwota</th>
+                        <th>Status</th>
+                        <th>Wystawiona</th>
+                        <th>Termin</th>
+                        <th style="width: 160px;">Akcje</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for invoice in invoices %}
+                        <tr>
+                            <td>{{ invoice.number }}</td>
+                            <td>{{ invoice.customerName }}</td>
+                            <td class="text-end">
+                                {{ invoice.netAmount|number_format(2, ',', ' ') }} zł
+                            </td>
+                            <td>
+                                {% if invoice.status == 'Opłacona' %}
+                                    <span class="badge bg-success">Opłacona</span>
+                                {% elseif invoice.status == 'Anulowana' %}
+                                    <span class="badge bg-secondary">Anulowana</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Wystawiona</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ invoice.issuedAt|date('Y-m-d') }}</td>
+                            <td>
+                                {{ invoice.dueDate ? invoice.dueDate|date('Y-m-d') : '-' }}
+                            </td>
+                            <td>
+                                <a href="{{ path('cost_invoice_edit', {id: invoice.id}) }}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Edytuj
+                                </a>
+
+                                <form action="{{ path('cost_invoice_delete', {id: invoice.id}) }}"
+                                      method="post" class="d-inline"
+                                      onsubmit="return confirm('Na pewno usunąć fakturę?');">
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        Usuń
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

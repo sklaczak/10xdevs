@@ -1,0 +1,68 @@
+{# templates/project/form.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {% if mode == 'create' %}
+        Nowy projekt
+    {% else %}
+        Edycja projektu
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4 class="mb-4">
+                {% if mode == 'create' %}
+                    ➕ Dodaj projekt
+                {% else %}
+                    ✏️ Edytuj projekt
+                {% endif %}
+            </h4>
+
+            <form method="post">
+
+                {# NAZWA PROJEKTU #}
+                <div class="mb-3">
+                    <label class="form-label">Nazwa projektu</label>
+                    <input
+                        type="text"
+                        name="name"
+                        class="form-control"
+                        value="{{ project.name ?? '' }}"
+                        required
+                    >
+                </div>
+
+                {# KONTRAHENT #}
+                <div class="mb-3">
+                    <label class="form-label">Kontrahent</label>
+                    <select name="customerId" class="form-select" required>
+                        <option value="">-- wybierz kontrahenta --</option>
+
+                        {% for customer in customers %}
+                            <option value="{{ customer.id }}"
+                                {% if project.customer and project.customer.id == customer.id %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ customer.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{{ path('project_list') }}" class="btn btn-secondary">
+                        ← Powrót
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Zapisz
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sklep – DEMO{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="page-title">Sklep kosztowy – Castorama Tychy (DEMO)</div>
+        <a href="{{ path('demo_invoice_show') }}" class="btn btn-sm btn-secondary">
+            ← Powrót do przykładowej faktury
+        </a>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        Castorama Tychy
+                    </h5>
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Adres</dt>
+                        <dd class="col-sm-8">
+                            ul. Przemysłowa 1<br>
+                            43-100 Tychy
+                        </dd>
+
+                        <dt class="col-sm-4">Typ</dt>
+                        <dd class="col-sm-8">Sklep budowlany</dd>
+
+                        <dt class="col-sm-4">Telefon</dt>
+                        <dd class="col-sm-8">+48 32 000 00 00</dd>
+
+                        <dt class="col-sm-4">Strona</dt>
+                        <dd class="col-sm-8">
+                            <a href="#" target="_blank" rel="noopener">
+                                castorama.pl (demo)
+                            </a>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    Lokalizacja (Google Maps – DEMO)
+                </div>
+                <div class="card-body p-0">
+                    <div style="width: 100%; height: 250px;">
+                        <iframe
+                            width="100%"
+                            height="250"
+                            style="border:0;"
+                            loading="lazy"
+                            allowfullscreen
+                            referrerpolicy="no-referrer-when-downgrade"
+                            src="https://www.google.com/maps/embed/v1/search?key=FAKE_API_KEY&q=Castorama+Tychy+Przemyslowa">
+                        </iframe>
+                    </div>
+                    <div class="p-2 text-muted" style="font-size: 0.8rem;">
+                        * W realnej aplikacji tutaj użyłbyś własnego klucza Google Maps API i prawidłowych współrzędnych.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Faktury kosztowe z tego sklepu</span>
+                    <span class="text-muted" style="font-size: 0.85rem;">
+                        DEMO – dane statyczne
+                    </span>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Numer</th>
+                            <th>Opis</th>
+                            <th class="text-end">Kwota</th>
+                            <th>Data</th>
+                            <th>Projekt</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>FK/2025/021</td>
+                            <td>Materiały wykończeniowe – segment A</td>
+                            <td class="text-end">4 560,20 zł</td>
+                            <td>2025-02-05</td>
+                            <td>Osiedle Słoneczne</td>
+                        </tr>
+                        <tr>
+                            <td>FK/2025/018</td>
+                            <td>Narzędzia ręczne i elektronarzędzia</td>
+                            <td class="text-end">2 340,00 zł</td>
+                            <td>2025-01-29</td>
+                            <td>Hala magazynowa Tychy</td>
+                        </tr>
+                        <tr>
+                            <td>FK/2025/010</td>
+                            <td>Materiały instalacyjne – hydraulika</td>
+                            <td class="text-end">1 980,75 zł</td>
+                            <td>2025-01-12</td>
+                            <td>Osiedle Słoneczne</td>
+                        </tr>
+                        <tr>
+                            <td>FK/2024/212</td>
+                            <td>Farby, grunty, akcesoria malarskie</td>
+                            <td class="text-end">3 110,30 zł</td>
+                            <td>2024-11-03</td>
+                            <td>Biuro 10xdevs</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

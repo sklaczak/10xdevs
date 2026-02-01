@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Formy płatności{% endblock %}
+
+{% block body %}
+    <h1>Formy płatności</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nazwa</th>
+            <th>Domyślna</th>
+            <th>Akcje</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for paymentMethod in paymentMethods %}
+            <tr>
+                <td>{{ paymentMethod.id }}</td>
+                <td>{{ paymentMethod.name }}</td>
+                <td>
+                    {% if paymentMethod.isDefault %}
+                        <span class="badge bg-success">Tak</span>
+                    {% else %}
+                        <span class="text-muted">Nie</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ path('payment_method_edit', {id: paymentMethod.id}) }}" class="btn btn-sm btn-primary">
+                        Edytuj
+                    </a>
+
+                    <form
+                        action="{{ path('payment_method_delete', {id: paymentMethod.id}) }}"
+                        method="post"
+                        style="display:inline-block"
+                        onsubmit="return confirm('Na pewno usunąć tę formę płatności?');"
+                    >
+                        <button class="btn btn-sm btn-danger">Usuń</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">Brak zdefiniowanych form płatności.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('payment_method_new') }}" class="btn btn-success">Dodaj nową formę płatności</a>
+{% endblock %}

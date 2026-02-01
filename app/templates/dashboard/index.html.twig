@@ -1,0 +1,130 @@
+{# templates/dashboard/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-chart-line"></i> Dashboard
+        </h1>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-bg-light mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Faktury dzisiaj</h5>
+                        <p class="display-6 mb-0">{{ todayAll }}</p>
+                        <small class="text-muted">łącznie (kosztowe + sprzedażowe)</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-bg-light mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Faktury kosztowe dzisiaj</h5>
+                        <p class="display-6 mb-0">{{ todayCost }}</p>
+                        <small class="text-muted">np. zakup materiałów</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-bg-light mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Faktury sprzedażowe dzisiaj</h5>
+                        <p class="display-6 mb-0">{{ todaySale }}</p>
+                        <small class="text-muted">sprzedaż do klientów</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-chart-column"></i>
+                        Nowe faktury w ostatnich 7 dniach
+                    </div>
+                    <div class="card-body">
+                        <canvas id="invoicesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-receipt"></i>
+                        Ostatnie faktury
+                    </div>
+                    <div class="card-body">
+                        {% if recentInvoices is empty %}
+                            <p class="text-muted mb-0">Brak faktur do wyświetlenia.</p>
+                        {% else %}
+                            <ul class="list-group list-group-flush">
+                                {% for invoice in recentInvoices %}
+                                    <li class="list-group-item">
+                                        <div class="fw-bold">
+                                            {{ invoice.number ?? ('Faktura #' ~ invoice.id) }}
+                                            {% if invoice.type %}
+                                                <span class="badge text-bg-secondary ms-2">
+                                                {{ invoice.type.value }}
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="small text-muted">
+                                            {{ invoice.issuedAt|date('Y-m-d H:i') }}
+                                            •
+                                            {% if invoice.person %}
+                                                dokonane przez {{ invoice.person.fullName ?? invoice.person }}
+                                            {% else %}
+                                                osoba nieprzypisana
+                                            {% endif %}
+                                        </div>
+                                        {% if invoice.totalAmount is defined %}
+                                            <div class="mt-1">
+                                                Kwota: <strong>{{ invoice.totalAmount|number_format(2, ',', ' ') }} zł</strong>
+                                            </div>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Chart.js #}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const stats = {{ lastDaysStats|json_encode|raw }};
+
+        const labels = stats.map(s => s.day);
+        const data   = stats.map(s => s.count);
+
+        const ctx = document.getElementById('invoicesChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Liczba nowych faktur',
+                    data: data,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        precision: 0
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}

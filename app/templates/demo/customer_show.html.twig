@@ -1,0 +1,120 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Kontrahent – DEMO{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="page-title">Szczegóły kontrahenta (DEMO)</div>
+        <a href="{{ path('demo_invoice_show') }}" class="btn btn-sm btn-secondary">
+            ← Powrót do przykładowej faktury
+        </a>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        Przedsiębiorstwo Budowlane „10xdevs” Sp. z o.o.
+                    </h5>
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">NIP</dt>
+                        <dd class="col-sm-8">123-456-78-90</dd>
+
+                        <dt class="col-sm-4">Adres</dt>
+                        <dd class="col-sm-8">
+                            ul. Budowlanych 10<br>
+                            43-100 Tychy
+                        </dd>
+
+                        <dt class="col-sm-4">Telefon</dt>
+                        <dd class="col-sm-8">+48 500 600 700</dd>
+
+                        <dt class="col-sm-4">Email</dt>
+                        <dd class="col-sm-8">biuro@10xdevs.pl</dd>
+
+                        <dt class="col-sm-4">Opiekun</dt>
+                        <dd class="col-sm-8">Sebastian S.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    Statystyki (DEMO)
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-6">Liczba faktur</dt>
+                        <dd class="col-sm-6">24</dd>
+
+                        <dt class="col-sm-6">Suma brutto</dt>
+                        <dd class="col-sm-6">352 450,00 zł</dd>
+
+                        <dt class="col-sm-6">Zaległe</dt>
+                        <dd class="col-sm-6">
+                            <span class="badge bg-warning text-dark">2</span>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Faktury kontrahenta</span>
+                    <span class="text-muted" style="font-size: 0.85rem;">
+                        DEMO – dane statyczne
+                    </span>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Numer</th>
+                            <th>Rodzaj</th>
+                            <th class="text-end">Kwota</th>
+                            <th>Status</th>
+                            <th>Data</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <a href="{{ path('demo_invoice_show') }}">FV/2025/001</a>
+                            </td>
+                            <td>Sprzedażowa</td>
+                            <td class="text-end">12 345,67 zł</td>
+                            <td><span class="badge bg-success">Opłacona</span></td>
+                            <td>2025-02-10</td>
+                        </tr>
+                        <tr>
+                            <td>FV/2025/002</td>
+                            <td>Sprzedażowa</td>
+                            <td class="text-end">7 800,00 zł</td>
+                            <td><span class="badge bg-warning text-dark">Wystawiona</span></td>
+                            <td>2025-02-18</td>
+                        </tr>
+                        <tr>
+                            <td>FK/2025/015</td>
+                            <td>Kosztowa</td>
+                            <td class="text-end">3 210,50 zł</td>
+                            <td><span class="badge bg-success">Opłacona</span></td>
+                            <td>2025-01-28</td>
+                        </tr>
+                        <tr>
+                            <td>FK/2025/009</td>
+                            <td>Kosztowa</td>
+                            <td class="text-end">1 150,00 zł</td>
+                            <td><span class="badge bg-secondary">Anulowana</span></td>
+                            <td>2025-01-10</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

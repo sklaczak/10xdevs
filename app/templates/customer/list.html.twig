@@ -1,0 +1,70 @@
+{# templates/customer/list.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Kontrahenci{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="page-title">Kontrahenci</div>
+        <a href="{{ path('customer_new') }}" class="btn btn-primary btn-sm">
+            + Dodaj kontrahenta
+        </a>
+    </div>
+
+    {# Flashe #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    {% if customers is empty %}
+        <div class="alert alert-info">
+            Brak kontrahentów do wyświetlenia.
+        </div>
+    {% else %}
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nazwa</th>
+                        <th class="text-end">Liczba projektów</th>
+                        <th style="width: 160px;">Akcje</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for customer in customers %}
+                        <tr>
+                            <td>{{ customer.id }}</td>
+                            <td>{{ customer.name }}</td>
+                            <td class="text-end">
+                                {% if customer.projects is defined %}
+                                    {{ customer.projects|length }}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ path('customer_edit', {id: customer.id}) }}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Edytuj
+                                </a>
+
+                                <form action="{{ path('customer_delete', {id: customer.id}) }}"
+                                      method="post" class="d-inline"
+                                      onsubmit="return confirm('Na pewno usunąć kontrahenta?');">
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        Usuń
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,14 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Jeśli żądany plik fizycznie istnieje, serwuj go
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    # Jeśli żądany katalog fizycznie istnieje, serwuj go
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # W pozostałych przypadkach wszystko leci do index.php
+    RewriteRule ^ index.php [L]
+</IfModule>

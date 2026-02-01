@@ -1,0 +1,328 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {% if mode == 'create' %}Dodaj fakturę{% else %}Edytuj fakturę{% endif %}
+{% endblock %}
+
+{% block body %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4 class="mb-4">
+                {% if mode == 'create' %}
+                    ➕ Dodaj fakturę
+                {% else %}
+                    ✏️ Edytuj fakturę
+                {% endif %}
+            </h4>
+
+            <form method="post">
+                <div class="mb-3">
+                    <label class="form-label">Numer faktury</label>
+                    <input type="text" name="number" class="form-control"
+                           value="{{ invoice.number ?? '' }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Kontrahent</label>
+                    <select name="customerId" id="customerId" class="form-select" required>
+                        <option value="">-- wybierz kontrahenta --</option>
+                        {% for customer in customers %}
+                            <option value="{{ customer.id }}"
+                                    {% if invoice.customer and invoice.customer.id == customer.id %}selected{% endif %}
+                            >
+                                {{ customer.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Projekt</label>
+                    <select name="projectId" id="projectId" class="form-select">
+                        <option value="">-- brak / nie dotyczy --</option>
+                        {% for project in projects %}
+                            <option value="{{ project.id }}"
+                                    {% if invoice.project and invoice.project.id == project.id %}selected{% endif %}
+                            >
+                                {{ project.name }} ({{ project.customer.name }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Kwota netto (PLN)</label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        name="netAmount"
+                        id="netAmount"
+                        class="form-control"
+                        value="{{ invoice.netAmount ?? '' }}"
+                        required
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Kwota brutto (PLN)</label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        name="grossAmount"
+                        id="grossAmount"
+                        class="form-control"
+                        value="{{ invoice.grossAmount ?? '' }}"
+                        required
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Podatek (PLN)</label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        name="taxAmount"
+                        id="taxAmount"
+                        class="form-control"
+                        value="{{ invoice.taxAmount ?? '' }}"
+                        required
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Vat</label>
+                    {% set currentTaxRate = invoice.taxRate ?? 23 %}
+                    <select name="taxRate" id="taxRate" class="form-select" required>
+                        <option value="23" {{ currentTaxRate == 23 ? 'selected' : '' }}>23</option>
+                        <option value="8"  {{ currentTaxRate == 8  ? 'selected' : '' }}>8</option>
+                        <option value="5"  {{ currentTaxRate == 5  ? 'selected' : '' }}>5</option>
+                        <option value="0"  {{ currentTaxRate == 0  ? 'selected' : '' }}>0</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Status</label>
+                    {% set currentStatus = invoice.status ?? 'Wystawiona' %}
+                    <select name="status" class="form-select">
+                        <option value="Wystawiona" {{ currentStatus == 'Wystawiona' ? 'selected' : '' }}>Wystawiona</option>
+                        <option value="Opłacona" {{ currentStatus == 'Opłacona' ? 'selected' : '' }}>Opłacona</option>
+                        <option value="Anulowana" {{ currentStatus == 'Anulowana' ? 'selected' : '' }}>Anulowana</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Data wystawienia</label>
+                    <input type="date" name="issuedAt" class="form-control"
+                           value="{{ invoice.issuedAt ? invoice.issuedAt|date('Y-m-d') : '' }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Termin płatności</label>
+                    <input type="date" name="dueDate" class="form-control"
+                           value="{{ invoice.dueDate ? invoice.dueDate|date('Y-m-d') : '' }}">
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{{ path('cost_invoice_list') }}" class="btn btn-secondary">
+                        Powrót
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Zapisz
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const netInput   = document.getElementById('netAmount');
+            const grossInput = document.getElementById('grossAmount');
+            const taxInput   = document.getElementById('taxAmount');
+            const taxRateSel = document.getElementById('taxRate');
+            const form       = document.querySelector('form');
+
+            function parseVal(input) {
+                if (!input) return null;
+                const raw = (input.value || '').replace(',', '.');
+                const val = parseFloat(raw);
+                return isNaN(val) ? null : val;
+            }
+
+            function setVal(input, value) {
+                if (!input) return;
+                if (value === null || !isFinite(value)) {
+                    input.value = '';
+                    return;
+                }
+                input.value = value.toFixed(2);
+            }
+
+            function getRate() {
+                const r = parseFloat(taxRateSel.value);
+                return isNaN(r) ? 0 : r;
+            }
+
+            function calcFromNet() {
+                const net  = parseVal(netInput);
+                const rate = getRate();
+
+                if (net === null) {
+                    setVal(grossInput, null);
+                    setVal(taxInput, null);
+                    return;
+                }
+
+                const tax   = net * rate / 100;
+                const gross = net + tax;
+
+                setVal(taxInput, tax);
+                setVal(grossInput, gross);
+            }
+
+            function calcFromGross() {
+                const gross = parseVal(grossInput);
+                const rate  = getRate();
+
+                if (gross === null) {
+                    setVal(netInput, null);
+                    setVal(taxInput, null);
+                    return;
+                }
+
+                if (rate === 0) {
+                    // przy VAT 0: net = gross, tax = 0
+                    setVal(netInput, gross);
+                    setVal(taxInput, 0);
+                    return;
+                }
+
+                const net = gross / (1 + rate / 100);
+                const tax = gross - net;
+
+                setVal(netInput, net);
+                setVal(taxInput, tax);
+            }
+
+            function calcFromTax() {
+                const tax  = parseVal(taxInput);
+                const rate = getRate();
+
+                if (tax === null) {
+                    return;
+                }
+
+                if (rate === 0) {
+                    // VAT 0, a jest jakiś podatek -> bzdura
+                    if (tax !== 0) {
+                        alert('Przy stawce VAT 0% podatek musi wynosić 0 PLN.');
+                        setVal(taxInput, 0);
+                    }
+                    const net = parseVal(netInput);
+                    if (net !== null) {
+                        setVal(grossInput, net);
+                    }
+                    return;
+                }
+
+                const net   = tax * 100 / rate;
+                const gross = net + tax;
+
+                setVal(netInput, net);
+                setVal(grossInput, gross);
+            }
+
+            // Walidacja „bzdur”: sprawdź, jaki VAT wychodzi z net i gross
+            function validateCombination(showAlert = true) {
+                const net   = parseVal(netInput);
+                const gross = parseVal(grossInput);
+                const rate  = getRate();
+
+                if (net === null || gross === null || net === 0) {
+                    return true; // nic do walidacji
+                }
+
+                const impliedRate = (gross / net - 1) * 100; // ile % wychodzi z liczb
+                const tol         = 0.05; // tolerancja błędu obliczeń
+
+                if (Math.abs(impliedRate - rate) > tol) {
+                    if (showAlert) {
+                        alert(
+                            'Kwoty netto/brutto sugerują stawkę VAT około '
+                            + impliedRate.toFixed(2)
+                            + '%, która nie pasuje do wybranej stawki '
+                            + rate.toFixed(2)
+                            + '%. Sprawdź wartości.'
+                        );
+                    }
+                    return false;
+                }
+
+                return true;
+            }
+
+            // Eventy: każde pole „źródłowe” przelicza resztę
+            netInput.addEventListener('input', function () {
+                calcFromNet();
+            });
+
+            grossInput.addEventListener('input', function () {
+                calcFromGross();
+            });
+
+            taxInput.addEventListener('input', function () {
+                calcFromTax();
+            });
+
+            // Zmiana stawki VAT przelicza wszystko na podstawie tego, co mamy
+            taxRateSel.addEventListener('change', function () {
+                const net   = parseVal(netInput);
+                const gross = parseVal(grossInput);
+
+                if (net !== null) {
+                    calcFromNet();
+                } else if (gross !== null) {
+                    calcFromGross();
+                } else if (parseVal(taxInput) !== null) {
+                    calcFromTax();
+                }
+            });
+
+            // Walidacja przy wyjściu z pól
+            [netInput, grossInput, taxInput].forEach(function (input) {
+                input.addEventListener('blur', function () {
+                    validateCombination(true);
+                });
+            });
+
+            // Walidacja przy submit – jeśli bzdura, blokujemy wysłanie
+            form.addEventListener('submit', function (e) {
+                const ok = validateCombination(true);
+                if (!ok) {
+                    e.preventDefault();
+                }
+            });
+
+            // Przy edycji – jeśli coś już jest wpisane, od razu ujednolicamy
+            const initNet   = parseVal(netInput);
+            const initGross = parseVal(grossInput);
+            const initTax   = parseVal(taxInput);
+
+            if (initNet !== null && (initGross === null || initTax === null)) {
+                calcFromNet();
+            } else if (initGross !== null && (initNet === null || initTax === null)) {
+                calcFromGross();
+            } else if (initTax !== null && (initNet === null || initGross === null)) {
+                calcFromTax();
+            }
+        });
+    </script>
+{% endblock %}

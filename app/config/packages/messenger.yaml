@@ -1,0 +1,45 @@
+framework:
+    messenger:
+        failure_transport: failed
+
+        transports:
+            # https://symfony.com/doc/current/messenger.html#transport-configuration
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    use_notify: true
+                    check_delayed_interval: 60000
+                retry_strategy:
+                    max_retries: 3
+                    multiplier: 2
+            failed: 'doctrine://default?queue_name=failed'
+            sync: 'sync://'
+
+        default_bus: messenger.bus.default
+
+        buses:
+            messenger.bus.default: []
+
+        routing:
+            Symfony\Component\Mailer\Messenger\SendEmailMessage: async
+            Symfony\Component\Notifier\Message\ChatMessage: async
+            Symfony\Component\Notifier\Message\SmsMessage: async
+
+            # Route your messages to the transports
+            # 'App\Message\YourMessage': async
+
+            # Commands
+            App\Person\Application\Command\CreatePerson\CreatePersonCommand: sync
+            App\Person\Application\Command\UpdatePerson\UpdatePersonCommand: sync
+            App\Person\Application\Command\DeletePerson\DeletePersonCommand: sync
+
+            # Queries
+            App\Person\Application\Query\GetPerson\GetPersonQuery: sync
+            App\Person\Application\Query\ListPersons\ListPersonsQuery: sync
+            App\Person\Application\Query\PersonsForSelect\PersonsForSelectQuery: sync
+
+            App\Identity\Application\Command\LoginWithGoogle\LoginWithGoogleCommand: sync
+            App\Identity\Application\Command\RegisterWithPassword\RegisterWithPasswordCommand: sync
+            App\Identity\Application\Command\LoginWithPassword\LoginWithPasswordCommand: sync
+
+            App\Identity\Application\Query\GetCurrentUser\GetCurrentUserQuery: sync

@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Szczegóły osoby
+{% endblock %}
+
+{% block body %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">
+                    👤 {{ person.fullName }}
+                </h4>
+
+                <div class="btn-group">
+                    <a href="{{ path('person_edit', {id: person.id}) }}"
+                       class="btn btn-sm btn-outline-primary">
+                        ✏️ Edytuj
+                    </a>
+
+                    <form method="post"
+                          action="{{ path('person_delete', {id: person.id}) }}"
+                          onsubmit="return confirm('Czy na pewno chcesz usunąć tę osobę?');"
+                          style="display:inline;">
+                        <button class="btn btn-sm btn-outline-danger">
+                            🗑 Usuń
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <th style="width: 200px;">Imię i nazwisko</th>
+                    <td>{{ person.fullName }}</td>
+                </tr>
+
+                <tr>
+                    <th>Email</th>
+                    <td>
+                        {% if person.email %}
+                            <a href="mailto:{{ person.email }}">
+                                {{ person.email }}
+                            </a>
+                        {% else %}
+                            <span class="text-muted">brak</span>
+                        {% endif %}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Telefon</th>
+                    <td>
+                        {% if person.phone %}
+                            {{ person.phone }}
+                        {% else %}
+                            <span class="text-muted">brak</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{{ path('person_list') }}" class="btn btn-secondary">
+                    ← Powrót do listy
+                </a>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

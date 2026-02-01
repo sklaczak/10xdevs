@@ -1,0 +1,70 @@
+{# templates/project/list.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Projekty{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="page-title">Projekty</div>
+        <a href="{{ path('project_new') }}" class="btn btn-primary btn-sm">
+            + Dodaj projekt
+        </a>
+    </div>
+
+    {# Flashe #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    {% if projects is empty %}
+        <div class="alert alert-info">
+            Brak projektów do wyświetlenia.
+        </div>
+    {% else %}
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nazwa projektu</th>
+                        <th>Kontrahent</th>
+                        <th style="width: 160px;">Akcje</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for project in projects %}
+                        <tr>
+                            <td>{{ project.id }}</td>
+                            <td>{{ project.name }}</td>
+                            <td>
+                                {% if project.customer %}
+                                    {{ project.customer.name }}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ path('project_edit', {id: project.id}) }}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Edytuj
+                                </a>
+
+                                <form action="{{ path('project_delete', {id: project.id}) }}"
+                                      method="post" class="d-inline"
+                                      onsubmit="return confirm('Na pewno usunąć projekt?');">
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        Usuń
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,26 @@
+security:
+    password_hashers:
+        App\Identity\Infrastructure\Security\PasswordHashUser:
+            algorithm: auto
+
+    providers:
+        app_user_provider:
+            id: App\Identity\Infrastructure\Security\UserProvider
+
+    firewalls:
+        main:
+            lazy: true
+            provider: app_user_provider
+            entry_point: App\Identity\Infrastructure\Security\LoginRedirectEntryPoint
+            custom_authenticators:
+                #- App\Identity\Infrastructure\Security\GoogleIdTokenAuthenticator
+                - App\Identity\Infrastructure\Security\PasswordJsonAuthenticator
+            logout:
+                path: /logout
+
+    access_control:
+        - { path: ^/auth, roles: PUBLIC_ACCESS }
+        - { path: ^/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/register$, roles: PUBLIC_ACCESS }
+        - { path: ^/persons, roles: PUBLIC_ACCESS }
+        - { path: ^/, roles: ROLE_USER }

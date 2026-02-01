@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Logowanie{% endblock %}
+
+{% block body %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4 class="mb-4">Logowanie</h4>
+
+            {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+
+            <form method="post">
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input class="form-control" type="email" name="email" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Hasło</label>
+                    <input class="form-control" type="password" name="password" required>
+                </div>
+
+                <button class="btn btn-primary" type="submit">Zaloguj</button>
+                <a class="btn btn-link" href="{{ path('register_page') }}">Rejestracja</a>
+            </form>
+        </div>
+    </div>
+{% endblock %}

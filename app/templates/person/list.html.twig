@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Osoby{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="page-title">Osoby</div>
+        <a href="{{ path('person_new') }}" class="btn btn-primary btn-sm">
+            + Dodaj osobę
+        </a>
+    </div>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    {% if persons is empty %}
+        <div class="alert alert-info">
+            Brak osób w systemie.
+        </div>
+    {% else %}
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Full name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th style="width: 140px;">Akcje</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for person in persons %}
+                        <tr>
+                            <td class="text-muted">{{ person.id }}</td>
+                            <td>{{ person.fullName }}</td>
+                            <td>{{ person.email }}</td>
+                            <td>{{ person.phone ?? '-' }}</td>
+                            <td>
+                                <a href="{{ path('person_edit', {id: person.id}) }}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Edytuj
+                                </a>
+
+                                <form action="{{ path('person_delete', {id: person.id}) }}"
+                                      method="post" class="d-inline"
+                                      onsubmit="return confirm('Na pewno usunąć?');">
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        Usuń
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

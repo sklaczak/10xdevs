@@ -1,0 +1,127 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {% if mode == 'create' %}
+        Nowa faktura kosztowa (mobile)
+    {% else %}
+        Edycja faktury kosztowej (mobile)
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-3">
+        <h1 class="h4 mb-3">
+            {% if mode == 'create' %}
+                Dodaj fakturę kosztową
+            {% else %}
+                Edytuj fakturę kosztową
+            {% endif %}
+        </h1>
+
+        <form method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="personId" class="form-label">Jestem</label>
+                <select id="personId" name="personId" class="form-select" required>
+                    <option value="">-- wybierz --</option>
+                    {% for person in people %}
+                        <option value="{{ person.id }}"
+                            {% if invoice.person is defined and invoice.person and invoice.person.id == person.id %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ person.fullName ?? person }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="paymentMethodId" class="form-label">Forma płatności</label>
+                <select id="paymentMethodId" name="paymentMethodId" class="form-select" required>
+                    <option value="">-- wybierz --</option>
+
+                    {% set isCreate = mode is defined and mode == 'create' %}
+                    {% set hasPaymentMethod = invoice.paymentMethod is defined and invoice.paymentMethod %}
+
+                    {% for method in paymentMethods %}
+                        {% set isSelected = false %}
+
+                        {# 1. Edycja – zawsze bierzemy to, co jest w encji #}
+                        {% if hasPaymentMethod and invoice.paymentMethod.id == method.id %}
+                            {% set isSelected = true %}
+
+                            {# 2. Tworzenie – jeśli brak przypisanej metody, wybierz domyślną #}
+                        {% elseif isCreate and not hasPaymentMethod and method.default %}
+                            {% set isSelected = true %}
+                        {% endif %}
+
+                        <option value="{{ method.id }}" {% if isSelected %}selected{% endif %}>
+                            {{ method.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="amount" class="form-label">Kwota</label>
+                <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    id="amount"
+                    name="amount"
+                    class="form-control"
+                    value="{{ invoice.amount ?? '' }}"
+                    required
+                >
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Opis</label>
+                <textarea
+                    id="description"
+                    name="description"
+                    class="form-control"
+                    rows="3"
+                >{{ invoice.description is defined ? invoice.description : '' }}</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Data</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ 'now'|date('Y-m-d H:i') }}"
+                    disabled
+                >
+                <div class="form-text">
+                    Data faktury zostanie ustawiona automatycznie na bieżącą.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="photo" class="form-label">Zdjęcie faktury (opcjonalne)</label>
+                <input
+                    type="file"
+                    id="photo"
+                    name="photo"
+                    class="form-control"
+                    accept="image/*"
+                >
+                <div class="form-text">
+                    Zdjęcie jest na razie tylko pobierane – jeszcze go nie zapisujemy w systemie.
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{{ path('mobile_cost_invoice_list') }}" class="btn btn-link">
+                    ← Lista faktur
+                </a>
+
+                <button type="submit" class="btn btn-success">
+                    Zapisz
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,84 @@
+name: Tests
+
+on:
+    pull_request:
+    push:
+        branches: [ master, main ]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        services:
+            postgres:
+                image: postgres:16
+                env:
+                    POSTGRES_DB: 10xdevs
+                    POSTGRES_USER: symfony
+                    POSTGRES_PASSWORD: symfony
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd="pg_isready -U symfony -d 10xdevs"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=10
+
+        env:
+            APP_ENV: test
+            APP_DEBUG: "0"
+            DATABASE_URL: "postgresql://symfony:symfony@127.0.0.1:5432/10xdevs?serverVersion=16&charset=utf8"
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "8.3"
+                  tools: composer
+                  coverage: none
+                  extensions: intl, pdo_pgsql, zip
+
+            - name: Get Composer cache dir
+              id: composer-cache
+              working-directory: app
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Cache Composer
+              uses: actions/cache@v4
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: ${{ runner.os }}-composer-${{ hashFiles('app/composer.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-composer-
+
+            - name: Validate composer.json
+              working-directory: app
+              run: composer validate --no-interaction
+
+            - name: Install dependencies
+              working-directory: app
+              run: composer install --no-interaction --prefer-dist
+
+            - name: Wait for DB
+              run: |
+                  for i in {1..30}; do
+                    pg_isready -h 127.0.0.1 -p 5432 -U symfony -d 10xdevs && exit 0
+                    sleep 1
+                  done
+                  echo "Postgres not ready"
+                  exit 1
+
+            - name: Run migrations
+              working-directory: app
+              run: php bin/console doctrine:migrations:migrate --no-interaction
+
+            - name: Run tests
+              working-directory: app
+              run: |
+                  if [ -f vendor/bin/phpunit ]; then
+                    vendor/bin/phpunit
+                  else
+                    php bin/phpunit
+                  fi

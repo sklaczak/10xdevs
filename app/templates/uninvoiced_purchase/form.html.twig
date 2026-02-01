@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {% if mode == 'create' %}
+        Nowy zakup nierozliczony
+    {% else %}
+        Edycja zakupu nierozliczonego
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1 class="mb-3">
+            {% if mode == 'create' %}
+                <i class="fa-solid fa-cart-shopping"></i> Nowy zakup nierozliczony
+            {% else %}
+                <i class="fa-solid fa-cart-shopping"></i> Edycja zakupu nierozliczonego
+            {% endif %}
+        </h1>
+
+        <form method="post">
+            <div class="mb-3">
+                <label for="amount" class="form-label">Kwota</label>
+                <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    id="amount"
+                    name="amount"
+                    class="form-control"
+                    value="{{ purchase.amount ?? '' }}"
+                    required
+                >
+            </div>
+
+            <div class="mb-3">
+                <label for="paymentMethodId" class="form-label">Forma płatności</label>
+                <select id="paymentMethodId" name="paymentMethodId" class="form-select" required>
+                    <option value="">-- wybierz --</option>
+                    {% for method in paymentMethods %}
+                        <option value="{{ method.id }}"
+                                {% if purchase.paymentMethod and purchase.paymentMethod.id == method.id %}selected{% endif %}
+                        >
+                            {{ method.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="personId" class="form-label">Osoba dokonująca zakupu</label>
+                <select id="personId" name="personId" class="form-select" required>
+                    <option value="">-- wybierz --</option>
+                    {% for person in people %}
+                        <option value="{{ person.id }}"
+                                {% if purchase.person and purchase.person.id == person.id %}selected{% endif %}
+                        >
+                            {{ person.fullName ?? person }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="expenseDate" class="form-label">Data zakupu</label>
+                <input
+                    type="date"
+                    id="expenseDate"
+                    name="expenseDate"
+                    class="form-control"
+                    value="{{ purchase.expenseDate ? purchase.expenseDate|date('Y-m-d') : '' }}"
+                    required
+                >
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Opis</label>
+                <textarea
+                    id="description"
+                    name="description"
+                    class="form-control"
+                    rows="3"
+                >{{ purchase.description ?? '' }}</textarea>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="{{ path('uninvoiced_purchase_list') }}" class="btn btn-link">
+                    ← Powrót do listy
+                </a>
+
+                <button type="submit" class="btn btn-success">
+                    {% if mode == 'create' %}
+                        Zapisz zakup
+                    {% else %}
+                        Zapisz zmiany
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

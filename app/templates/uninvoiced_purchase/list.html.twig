@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Zakupy nierozliczone{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1>
+                <i class="fa-solid fa-cart-shopping"></i>
+                Zakupy nierozliczone
+            </h1>
+
+            <a href="{{ path('uninvoiced_purchase_new') }}" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i> Dodaj zakup
+            </a>
+        </div>
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        {% if purchases is empty %}
+            <p class="text-muted">Brak zapisanych zakupów nierozliczonych.</p>
+        {% else %}
+            <table class="table table-striped align-middle">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Kwota</th>
+                    <th>Forma płatności</th>
+                    <th>Osoba</th>
+                    <th>Data zakupu</th>
+                    <th>Akcje</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for purchase in purchases %}
+                    <tr>
+                        <td>{{ purchase.id }}</td>
+                        <td>{{ purchase.amount|number_format(2, ',', ' ') }} zł</td>
+                        <td>{{ purchase.paymentMethod ? purchase.paymentMethod.name : '-' }}</td>
+                        <td>
+                            {% if purchase.person %}
+                                {{ purchase.person.fullName ?? purchase.person }}
+                            {% else %}
+                                <span class="text-muted">brak</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ purchase.expenseDate ? purchase.expenseDate|date('Y-m-d') : '-' }}
+                        </td>
+                        <td>
+                            <a href="{{ path('uninvoiced_purchase_edit', {id: purchase.id}) }}"
+                               class="btn btn-sm btn-outline-secondary">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+
+                            <form method="post"
+                                  action="{{ path('uninvoiced_purchase_delete', {id: purchase.id}) }}"
+                                  style="display:inline-block"
+                                  onsubmit="return confirm('Na pewno usunąć ten zakup?');">
+                                <button class="btn btn-sm btn-outline-danger">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}
