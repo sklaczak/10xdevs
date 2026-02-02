@@ -19,3 +19,5 @@ COPY app/ ./
 RUN composer install --no-interaction
 
 RUN mkdir -p var/cache var/log && chown -R www-data:www-data var
+
+CMD ["sh","-lc","php -S 0.0.0.0:$PORT -t public"]
